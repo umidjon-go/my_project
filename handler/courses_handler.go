@@ -25,10 +25,22 @@ func (h *Handler) CreateCourse(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, course)
 }
+
+func (h *Handler) GetCourses(c *gin.Context) {
+	courses, err := h.storage.GetCourses()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, courses)
+}
+
 func (h *Handler) GetCourse(c *gin.Context) {
 	courseIdStr := c.Param("course_id")
 	courseId, err := strconv.Atoi(courseIdStr)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -43,16 +55,24 @@ func (h *Handler) GetCourse(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, course)
 }
+
 func (h *Handler) PutCourse(c *gin.Context) {
 	courseIdStr := c.Param("course_id")
 	courseId, err := strconv.Atoi(courseIdStr)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	course, err := h.storage.PutCourse(courseId)
+	var body models.Course
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	course, err := h.storage.PutCourse(courseId, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -61,6 +81,7 @@ func (h *Handler) PutCourse(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, course)
 }
+
 func (h *Handler) DeleteCourse(c *gin.Context) {
 	courseIdStr := c.Param("course_id")
 	courseId, err := strconv.Atoi(courseIdStr)
@@ -78,6 +99,6 @@ func (h *Handler) DeleteCourse(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-       "delete": "The course was deleted successfully!!!",
+		"delete": "The course was deleted successfully!!!",
 	})
 }

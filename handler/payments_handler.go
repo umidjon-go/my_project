@@ -25,6 +25,18 @@ func (h *Handler) CreatePayment(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, payment)
 }
+
+func (h *Handler) GetPayments(c *gin.Context) {
+	payments, err := h.storage.GetPayments()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, payments)
+}
+
 func (h *Handler) GetPayment(c *gin.Context) {
 	paymentIdStr := c.Param("payment_id")
 	paymentId, err := strconv.Atoi(paymentIdStr)
@@ -43,6 +55,7 @@ func (h *Handler) GetPayment(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, payment)
 }
+
 func (h *Handler) PutPayment(c *gin.Context) {
 	paymentIdStr := c.Param("payment_id")
 	paymentId, err := strconv.Atoi(paymentIdStr)
@@ -52,7 +65,14 @@ func (h *Handler) PutPayment(c *gin.Context) {
 		})
 		return
 	}
-	payment, err := h.storage.PutPayment(paymentId)
+	var body models.Payment
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	payment, err := h.storage.PutPayment(paymentId, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

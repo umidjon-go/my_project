@@ -4,8 +4,8 @@ import "edu-crm/models"
 
 func (s *Storage) CreateLessonStudent(lessonStudent models.Lesson_Student) (*models.Lesson_Student, error) {
 	var response models.Lesson_Student
-	query := "INSERT INTO lesson_students(lesson_id, student_id) VALUES($1, $2) RETURNING *"
-	err := s.DB.QueryRow(query, lessonStudent.LessonId, lessonStudent.LessonId).
+	query := "INSERT INTO lesson_students(lesson_id, student_id, status) VALUES($1, $2, $3) RETURNING *"
+	err := s.DB.QueryRow(query, lessonStudent.LessonId, lessonStudent.StudentId, lessonStudent.Status).
 	Scan(&response.LessonId,
 		&response.StudentId,
 		&response.Status,

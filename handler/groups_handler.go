@@ -25,6 +25,18 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, group)
 }
+
+func (h *Handler) GetGroups(c *gin.Context) {
+	groups, err := h.storage.GetGroups()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, groups)
+}
+
 func (h *Handler) GetGroup(c *gin.Context) {
 	groupIdStr := c.Param("group_id")
 	groupId, err := strconv.Atoi(groupIdStr)
@@ -53,7 +65,14 @@ func (h *Handler) PutGroup(c *gin.Context) {
 		})
 		return
 	}
-	group, err := h.storage.PutGroup(groupId)
+	var body models.Group
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	group, err := h.storage.PutGroup(groupId, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
