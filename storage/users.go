@@ -4,11 +4,14 @@ import "edu-crm/models"
 
 func (s *Storage) CreateUser(user models.User) (*models.User, error) {
 	var response models.User
-	query := "INSERT INTO users(first_name, last_name, phone, status, rating_score, role, position) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *"
-	err := s.DB.QueryRow(query, user.FirstName, user.LastName, user.Phone, user.Status, user.RatingScore, user.Role, user.Position).
+	query := `INSERT INTO users(first_name, last_name, branch_id, phone, status, rating_score, role, position) 
+			  VALUES($1, $2, NULLIF($3, 0), $4, $5, $6, $7, $8) 
+			  RETURNING id, first_name, last_name, COALESCE(branch_id, 0), phone, status, rating_score, role, position, created_at, updated_at`
+	err := s.DB.QueryRow(query, user.FirstName, user.LastName, user.BranchId, user.Phone, user.Status, user.RatingScore, user.Role, user.Position).
 		Scan(&response.Id,
 			&response.FirstName,
 			&response.LastName,
+			&response.BranchId,
 			&response.Phone,
 			&response.Status,
 			&response.RatingScore,
@@ -25,11 +28,13 @@ func (s *Storage) CreateUser(user models.User) (*models.User, error) {
 
 func (s *Storage) GetUser(userId int) (*models.User, error) {
 	var response models.User
-	query := "SELECT id, first_name, last_name, phone, status, rating_score, role, position, created_at, updated_at FROM users WHERE id = $1"
+	query := `SELECT id, first_name, last_name, COALESCE(branch_id, 0), phone, status, rating_score, role, position, created_at, updated_at 
+			  FROM users WHERE id = $1`
 	err := s.DB.QueryRow(query, userId).
 		Scan(&response.Id,
 			&response.FirstName,
 			&response.LastName,
+			&response.BranchId,
 			&response.Phone,
 			&response.Status,
 			&response.RatingScore,
@@ -45,7 +50,8 @@ func (s *Storage) GetUser(userId int) (*models.User, error) {
 }
 
 func (s *Storage) GetUsers() ([]models.User, error) {
-	query := "SELECT id, first_name, last_name, phone, status, rating_score, role, position, created_at, updated_at FROM users ORDER BY id DESC"
+	query := `SELECT id, first_name, last_name, COALESCE(branch_id, 0), phone, status, rating_score, role, position, created_at, updated_at 
+			  FROM users ORDER BY id DESC`
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -59,6 +65,7 @@ func (s *Storage) GetUsers() ([]models.User, error) {
 			&u.Id,
 			&u.FirstName,
 			&u.LastName,
+			&u.BranchId,
 			&u.Phone,
 			&u.Status,
 			&u.RatingScore,
@@ -80,11 +87,15 @@ func (s *Storage) GetUsers() ([]models.User, error) {
 
 func (s *Storage) PutUser(userId int, user models.User) (*models.User, error) {
 	var response models.User
-	query := "UPDATE users SET first_name = $1, last_name = $2, phone = $3, status = $4, rating_score = $5, role = $6, position = $7, updated_at = NOW() WHERE id = $8 RETURNING *"
-	err := s.DB.QueryRow(query, user.FirstName, user.LastName, user.Phone, user.Status, user.RatingScore, user.Role, user.Position, userId).
+	query := `UPDATE users 
+			  SET first_name = $1, last_name = $2, branch_id = NULLIF($3, 0), phone = $4, status = $5, rating_score = $6, role = $7, position = $8, updated_at = NOW() 
+			  WHERE id = $9 
+			  RETURNING id, first_name, last_name, COALESCE(branch_id, 0), phone, status, rating_score, role, position, created_at, updated_at`
+	err := s.DB.QueryRow(query, user.FirstName, user.LastName, user.BranchId, user.Phone, user.Status, user.RatingScore, user.Role, user.Position, userId).
 		Scan(&response.Id,
 			&response.FirstName,
 			&response.LastName,
+			&response.BranchId,
 			&response.Phone,
 			&response.Status,
 			&response.RatingScore,

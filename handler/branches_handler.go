@@ -63,7 +63,7 @@ func (h *Handler) PutBranch(c *gin.Context) {
 		return
 	}
 	var body models.Branch
-	if err := c.ShouldBindJSON(body); err != nil {
+	if err := c.ShouldBindJSON(&body); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})

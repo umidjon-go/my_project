@@ -59,8 +59,8 @@ func (s *Storage) GetBranches() ([]models.Branch, error) {
 }
 func (s *Storage) PutBranch(branchId int, branch models.Branch) (*models.Branch, error) {
 	var response models.Branch
-	query := "UPDATE branches SET id = $1, name = $2, status = $3, location = $4 WHERE id = $5 RETURNING *"
-	err := s.DB.QueryRow(query, branch.Id, branch.Name, branch.Status, branch.Location, branchId).
+	query := "UPDATE branches SET name = $1, status = $2, location = $3 WHERE id = $4 RETURNING id, name, status, location, created_at"
+	err := s.DB.QueryRow(query, branch.Name, branch.Status, branch.Location, branchId).
 		Scan(&response.Id,
 			&response.Name,
 			&response.Status,

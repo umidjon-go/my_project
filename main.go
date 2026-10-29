@@ -37,8 +37,8 @@ func main() {
 	branch := route.Group("/branches")
 	{
 		branch.POST("", handler.CreateBranch)
-		branch.GET("", handler.GetBranch)
-		branch.GET("/:branch_id", handler.GetBranches)
+		branch.GET("", handler.GetBranches)
+		branch.GET("/:branch_id", handler.GetBranch)
 		branch.PUT("/:branch_id", handler.PutBranch)
 		branch.DELETE("/:branch_id", handler.DeleteBranch)
 	}

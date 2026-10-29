@@ -5,7 +5,9 @@ import "edu-crm/models"
 func (s *Storage) CreateCourse(course models.Course) (*models.Course, error) {
 	var response models.Course
 
-	query := "INSERT INTO courses(user_id, branch_id, title, description, price, status) VALUES($1, $2, $3, $4, $5, $6) RETURNING *"
+	query := `INSERT INTO courses(user_id, branch_id, title, description, price, status) 
+			  VALUES($1, NULLIF($2, 0), $3, $4, $5, $6) 
+			  RETURNING id, user_id, COALESCE(branch_id, 0), title, description, price, status, created_at, updated_at`
 	err := s.DB.QueryRow(query, course.UserId, course.BranchId, course.Title, course.Description, course.Price, course.Status).
 		Scan(&response.Id,
 			&response.UserId,
@@ -25,7 +27,8 @@ func (s *Storage) CreateCourse(course models.Course) (*models.Course, error) {
 
 func (s *Storage) GetCourse(courseId int) (*models.Course, error) {
 	var response models.Course
-    query := "SELECT id, user_id, branch_id, title, description, price, status, created_at, updated_at FROM courses WHERE id = $1"
+	query := `SELECT id, user_id, COALESCE(branch_id, 0), title, description, price, status, created_at, updated_at 
+			  FROM courses WHERE id = $1`
 	err := s.DB.QueryRow(query, courseId).
 		Scan(&response.Id,
 			&response.UserId,
@@ -44,7 +47,8 @@ func (s *Storage) GetCourse(courseId int) (*models.Course, error) {
 }
 
 func (s *Storage) GetCourses() ([]models.Course, error) {
-	query := "SELECT id, user_id, branch_id, title, description, price, status, created_at, updated_at FROM courses ORDER BY id DESC"
+	query := `SELECT id, user_id, COALESCE(branch_id, 0), title, description, price, status, created_at, updated_at 
+			  FROM courses ORDER BY id DESC`
 
 	rows, err := s.DB.Query(query)
 	if err != nil {
@@ -55,7 +59,7 @@ func (s *Storage) GetCourses() ([]models.Course, error) {
 	var courses []models.Course
 	for rows.Next() {
 		var c models.Course
-		err := rows.Scan(&c.Id, &c.UserId, &c.Title, &c.Description, &c.Price, &c.Status, &c.CreatedAt, &c.UpdatedAt)
+		err := rows.Scan(&c.Id, &c.UserId, &c.BranchId, &c.Title, &c.Description, &c.Price, &c.Status, &c.CreatedAt, &c.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +73,10 @@ func (s *Storage) GetCourses() ([]models.Course, error) {
 
 func (s *Storage) PutCourse(courseId int, course models.Course) (*models.Course, error) {
 	var response models.Course
-	query := "UPDATE courses SET user_id = $1, branch_id = $2, title = $3, description = $4, price = $5, status = $6, updated_at = NOW() WHERE id = $7 RETURNING *"
+	query := `UPDATE courses 
+			  SET user_id = $1, branch_id = NULLIF($2, 0), title = $3, description = $4, price = $5, status = $6, updated_at = NOW() 
+			  WHERE id = $7 
+			  RETURNING id, user_id, COALESCE(branch_id, 0), title, description, price, status, created_at, updated_at`
 	err := s.DB.QueryRow(query, course.UserId, course.BranchId, course.Title, course.Description, course.Price, course.Status, courseId).
 		Scan(&response.Id,
 			&response.UserId,
