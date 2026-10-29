@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS courses(
     "id" SERIAL PRIMARY KEY,
     "user_id" INT REFERENCES users(id) ON DELETE SET NULL,
+    "branch_id" INT REFERENCES branches(id) ON DELETE SET NULL,
     "title" VARCHAR(255),
     "description" TEXT,
     "price" BIGINT DEFAULT 0,

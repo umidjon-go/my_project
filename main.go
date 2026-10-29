@@ -31,9 +31,18 @@ func main() {
 
 	handler := handler.NewHandler(storage)
 
-	route := gin.Default()
-
+    route := gin.Default()
 	route.Use(middleware.CORSMiddleware())
+
+	branch := route.Group("/branches")
+	{
+		branch.POST("", handler.CreateBranch)
+		branch.GET("", handler.GetBranch)
+		branch.GET("/:branch_id", handler.GetBranches)
+		branch.PUT("/:branch_id", handler.PutBranch)
+		branch.DELETE("/:branch_id", handler.DeleteBranch)
+	}
+
 
 	user := route.Group("/users")
 	{
@@ -89,6 +98,7 @@ func main() {
 		payment.PUT("/:payment_id", handler.PutPayment)
 		payment.DELETE("/:payment_id", handler.DeletePayment)
 	}
+	
 
 	if err := route.Run(":8080"); err != nil {
 		log.Fatalf("failed to run port 8080: %v\n", err)

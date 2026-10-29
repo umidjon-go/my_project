@@ -6,6 +6,7 @@ type Group struct {
 	Id        int        `json:"id"`
 	CourseId  int        `json:"course_id"`
 	UserId    int        `json:"user_id"`
+	BranchId  int        `json:"branch_id"`
 	Name      string     `json:"name"`
 	Status    string     `json:"status"`
 	Days      string     `json:"days"`

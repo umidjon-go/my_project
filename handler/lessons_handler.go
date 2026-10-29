@@ -54,7 +54,9 @@ func (h *Handler) GetLesson(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, lesson)
+
 }
+
 
 func (h *Handler) PutLesson(c *gin.Context) {
 	lessonIdStr := c.Param("lesson_id")
@@ -81,6 +83,8 @@ func (h *Handler) PutLesson(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, lesson)
 }
+
+
 
 func (h *Handler) CompleteLesson(c *gin.Context) {
 	lessonIdStr := c.Param("lesson_id")

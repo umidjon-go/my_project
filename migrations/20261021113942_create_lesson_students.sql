@@ -8,3 +8,4 @@ CREATE TABLE IF NOT EXISTS lesson_students(
 -- +goose Down
 DROP TABLE IF EXISTS lesson_students;
 
+

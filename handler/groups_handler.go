@@ -56,6 +56,7 @@ func (h *Handler) GetGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, group)
 }
 
+
 func (h *Handler) PutGroup(c *gin.Context) {
 	groupIdStr := c.Param("group_id")
 	groupId, err := strconv.Atoi(groupIdStr)

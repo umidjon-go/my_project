@@ -86,7 +86,9 @@ func (s *Storage) GetPayments() ([]models.Payment, error) {
 
 func (s *Storage) PutPayment(paymentId int, payment models.Payment) (*models.Payment, error) {
 	var response models.Payment
-	query := `UPDATE payments SET course_id = $1, student_id = $2, group_id = $3, user_id = $4, amount = $5, payment_type = $6, status = $7, paid_at = $8, comment = $9, updated_at = NOW() WHERE id = $10 RETURNING *`
+
+	query := "UPDATE payments SET course_id = $1, student_id = $2, group_id = $3, user_id = $4, amount = $5, payment_type = $6, status = $7, paid_at = $8, comment = $9, updated_at = NOW() WHERE id = $10 RETURNING *"
+
 	err := s.DB.QueryRow(query, payment.CourseId, payment.StudentId, payment.GroupId, payment.UserId, payment.Amount, payment.PaymentType, payment.Status, payment.PaidAt, payment.Comment, paymentId).
 		Scan(&response.Id,
 			&response.CourseId,

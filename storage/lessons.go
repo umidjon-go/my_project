@@ -1,8 +1,6 @@
 package storage
 
-import (
-	"edu-crm/models"
-)
+import "edu-crm/models"
 
 func (s *Storage) CreateLesson(lesson models.Lesson) (*models.Lesson, error) {
 	var response models.Lesson
@@ -111,6 +109,7 @@ func (s *Storage) CompleteLesson(lessonId int) (*models.Lesson, error) {
 			&response.CreatedAt,
 			&response.CompletedAt,
 		)
+
 	if err != nil {
 		return nil, err
 	}

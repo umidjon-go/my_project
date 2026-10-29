@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS payments(
 DROP TABLE IF EXISTS payments;
 
 
+

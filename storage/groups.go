@@ -4,11 +4,13 @@ import "edu-crm/models"
 
 func (s *Storage) CreateGroup(group models.Group) (*models.Group, error) {
 	var response models.Group
-	query := "INSERT INTO groups(course_id, user_id, name, status, days, start_time, end_time, room, start_date, end_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *"
-	err := s.DB.QueryRow(query, group.CourseId, group.UserId, group.Name, group.Status, group.Days, group.StartTime, group.EndTime, group.Room, group.StartDate, group.EndDate).
+
+	query := "INSERT INTO groups(course_id, user_id, branch_id, name, status, days, start_time, end_time, room, start_date, end_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *"
+	err := s.DB.QueryRow(query, group.CourseId, group.UserId, group.BranchId, group.Name, group.Status, group.Days, group.StartTime, group.EndTime, group.Room, group.StartDate, group.EndDate).
 		Scan(&response.Id,
 			&response.CourseId,
 			&response.UserId,
+			&response.BranchId,
 			&response.Name,
 			&response.Status,
 			&response.Days,
@@ -29,11 +31,12 @@ func (s *Storage) CreateGroup(group models.Group) (*models.Group, error) {
 
 func (s *Storage) GetGroup(groupId int) (*models.Group, error) {
 	var response models.Group
-	query := "SELECT id, course_id, user_id, name, status, days, start_time, end_time, room, start_date, end_date, created_at, updated_at FROM groups WHERE id = $1"
+	query := "SELECT id, course_id, user_id, branch_id, name, status, days, start_time, end_time, room, start_date, end_date, created_at, updated_at FROM groups WHERE id = $1"
 	err := s.DB.QueryRow(query, groupId).
 		Scan(&response.Id,
 			&response.CourseId,
 			&response.UserId,
+			&response.BranchId,
 			&response.Name,
 			&response.Status,
 			&response.Days,
@@ -52,7 +55,7 @@ func (s *Storage) GetGroup(groupId int) (*models.Group, error) {
 }
 
 func (s *Storage) GetGroups() ([]models.Group, error) {
-	query := "SELECT id, course_id, user_id, name, status, days, start_time, end_time, room, start_date, end_date, created_at, updated_at FROM groups ORDER BY id DESC"
+	query := "SELECT id, course_id, user_id, branch_id, name, status, days, start_time, end_time, room, start_date, end_date, created_at, updated_at FROM groups ORDER BY id DESC"
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -66,6 +69,7 @@ func (s *Storage) GetGroups() ([]models.Group, error) {
 			&g.Id,
 			&g.CourseId,
 			&g.UserId,
+			&g.BranchId,
 			&g.Name,
 			&g.Status,
 			&g.Days,
@@ -90,11 +94,13 @@ func (s *Storage) GetGroups() ([]models.Group, error) {
 
 func (s *Storage) PutGroup(groupId int, group models.Group) (*models.Group, error) {
 	var response models.Group
-	query := "UPDATE groups SET course_id = $1, user_id = $2, name = $3, status = $4, days = $5, start_time = $6, end_time = $7, room = $8, start_date = $9, end_date = $10, updated_at = NOW() WHERE id = $11 RETURNING *"
-	err := s.DB.QueryRow(query, group.CourseId, group.UserId, group.Name, group.Status, group.Days, group.StartTime, group.EndTime, group.Room, group.StartDate, group.EndDate, groupId).
+
+	query := "UPDATE groups SET course_id = $1, user_id = $2, branch_id = $3, name = $4, status = $5, days = $6, start_time = $7, end_time = $8, room = $9, start_date = $10, end_date = $11, updated_at = NOW() WHERE id = $12 RETURNING *"
+	err := s.DB.QueryRow(query, group.CourseId, group.UserId, group.BranchId, group.Name, group.Status, group.Days, group.StartTime, group.EndTime, group.Room, group.StartDate, group.EndDate, groupId).
 		Scan(&response.Id,
 			&response.CourseId,
 			&response.UserId,
+			&response.BranchId,
 			&response.Name,
 			&response.Status,
 			&response.Days,
@@ -111,6 +117,8 @@ func (s *Storage) PutGroup(groupId int, group models.Group) (*models.Group, erro
 	}
 	return &response, nil
 }
+
+
 
 func (s *Storage) DeleteGroup(groupId int) error {
 	query := "DELETE FROM groups WHERE id = $1"

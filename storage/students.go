@@ -1,10 +1,14 @@
 package storage
 
+
 import "edu-crm/models"
+
+
+
 
 func (s *Storage) CreateStudent(student models.Student) (*models.Student, error) {
 	var response models.Student
-	query := "INSERT INTO students(course_id, user_id, group_id, full_name, phone, parent_phone, status) VALUES($1, $2, $3, $4, $5, $6, COALESCE(NULLIF($7, ''), 'NEW')) RETURNING *"
+	query := "INSERT INTO students(course_id, user_Id, group_id, full_name, phone, parent_phone, status) VALUES($1, $2, $3, $4, $5, $6, COALESCE(NULLIF($7, ''), 'NEW')) RETURNING *"
 	err := s.DB.QueryRow(query, student.CourseId, student.UserId, student.GroupId, student.FullName, student.Phone, student.ParentPhone, student.Status).
 		Scan(&response.Id,
 			&response.CourseId,
@@ -43,7 +47,6 @@ func (s *Storage) GetStudent(studentId int) (*models.Student, error) {
 	}
 	return &response, nil
 }
-
 func (s *Storage) GetStudents() ([]models.Student, error) {
 	query := "SELECT id, course_id, user_id, group_id, full_name, phone, parent_phone, status, created_at, updated_at FROM students ORDER BY id DESC"
 	rows, err := s.DB.Query(query)
@@ -106,4 +109,7 @@ func (s *Storage) DeleteStudent(studentId int) error {
 		return err
 	}
 	return nil
+
+
 }
+
